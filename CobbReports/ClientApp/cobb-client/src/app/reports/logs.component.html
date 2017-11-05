@@ -1,0 +1,27 @@
+<h2>Available Logs</h2>
+<div class='table-responsive'>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Logger</th>
+                <th>Vehicle</th>
+                <th>Map</th>
+                <th>Log Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let log of logs">
+                <td>
+                    <a [routerLink]="['/reports', log.id, log.logCount, log.mapInfo]">
+                        {{ log.id }}
+                    </a>
+                </td>
+                <td>{{log.loggerVersionInfo}}</td>
+                <td>{{log.vehicleInfo}}</td>
+                <td>{{log.mapInfo}}</td>
+                <td>{{log.logCount}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using CobbReports.Domain;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Data;
+using System.Reflection;
 
 namespace CobbReports.Api.Controllers
 {
@@ -39,20 +41,15 @@ namespace CobbReports.Api.Controllers
             }
 
             var log = _context.Logs.Where(l => l.LogInfoId == id).OrderBy(l => l.Time).ToList();
-            var rows = log.Count + 1;
-            object[,] stuff = new object[rows, 3];
-            stuff[0, 0] = "Time";
-            stuff[0, 1] = "Boost Error";
-            stuff[0, 2] = "Throttle";
-            for (int i = 1; i < rows; i++)
+            var fields = new Dictionary<string, string>
             {
-                stuff[i, 0] = log[i - 1].Time;
-                stuff[i, 1] = log[i - 1].TDBoostError;
-                stuff[i, 2] = log[i - 1].ThrottlePos;
-            }
+                {"Time", "Time" },
+                {"ThrottlePos", "Throttle" },
+                {"GearPosition", "Gear" },
+                {"TDBoostError", "Boost Error" },
+            };
 
-            
-
+            var stuff = getChartDataArray(log, fields);
             var resultObject = new { chartData = stuff };
 
             //var result = JArray.FromObject(stuff);
@@ -65,6 +62,7 @@ namespace CobbReports.Api.Controllers
 
             return Ok(log);
         }
+
 
         // PUT: api/Logs/5
         [HttpPut("{id}")]
@@ -142,57 +140,38 @@ namespace CobbReports.Api.Controllers
             return _context.Logs.Any(e => e.Id == id);
         }
 
-       
-    }
-
-    public class TableData
-    {
-        public TableData()
+        #region Helpers
+        private object[,] getChartDataArray(List<Log> logs, Dictionary<string,string> fields)
         {
-            this.RowCollection = new List<Row>();
-            this.ColumnCollection = new List<Column>();
+            var properties = typeof(Log).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var rowCount = logs.Count + 1;
+            var columnCount = fields.Count;
+
+            object[,] result = new object[rowCount, fields.Count];
+            int f = 0;
+
+            // Table headings
+            foreach (var field in fields)
+            {
+                result[0, f] = field.Value;
+                f++;
+            }
+
+            // Table rows
+            for (int i = 1; i < rowCount; i++)
+            {
+                int j = 0;
+                foreach (var kvp in fields)
+                {
+                    result[i, j] = typeof(Log).GetProperty(kvp.Key).GetValue(logs[i - 1]);
+                    j++;
+                }
+                
+            }
+
+            return result;
         }
-        [JsonIgnore]
-        public List<Row> RowCollection { get; set; }
-        [JsonIgnore]
-        public List<Column> ColumnCollection { get; set; }
+        #endregion
 
-        public Row[] rows { get { return this.RowCollection.ToArray(); } }
-        public Column[] cols { get { return this.ColumnCollection.ToArray(); } }
-    }
-
-    public class Column
-    {
-        public string id { get; set; }
-        public string label { get; set; }
-        public string type { get; set; }
-    }
-
-    public class Row
-    {
-        public Row()
-        {
-            this.CellCollection = new List<Cell>();
-        }
-        [JsonIgnore]
-        public List<Cell> CellCollection { get; set; }
-        public Cell[] c { get { return this.CellCollection.ToArray(); } }
-
-    }
-
-    public class Cell
-    {
-        public object v { get; set; }
-        public string f { get; set; }
-    }
-
-    public class HeaderRow
-    {
-        public HeaderRow()
-        {
-
-        }
-        public string type { get; set; }
-        public string label { get; set; }
     }
 }

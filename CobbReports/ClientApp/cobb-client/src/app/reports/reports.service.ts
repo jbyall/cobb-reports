@@ -9,12 +9,14 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/map';
 
-import { IReport, Report } from './report';
+import { IReport, Report, ILog } from './report';
 
 @Injectable()
 export class ReportsService {
-    private _reportsUrl = "http://localhost:59814/api/logs/23";
+    private _reportsUrl = "http://localhost:59814/api/logs";
+    private _logsUrl = "http://localhost:59814/api/loginfos";
     //private _reportsUrl = './api/reports.json';
 
     constructor(private _http: HttpClient) { }
@@ -23,8 +25,12 @@ export class ReportsService {
     //    return new Report();
     //    }
     //}
-    getReports(): Observable<IReport[]> {
-        return this._http.get<IReport[]>(this._reportsUrl);
+    getReports(id: number): Observable<IReport[]> {
+    return this._http.get<IReport[]>(this._reportsUrl + '/' + id.toString());
             //.do(data => console.log('All: ' + JSON.stringify(data)));
+    }
+
+    getLogs(): Observable<ILog[]> {
+        return this._http.get<ILog[]>(this._logsUrl);
     }
 }

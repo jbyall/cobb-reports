@@ -28,6 +28,15 @@ export interface IReport {
     chartData: any[];
 }
 
+export interface ILog {
+    id: number,
+    logs: any,
+    loggerVersionInfo: string,
+    vehicleInfo: string,
+    mapInfo: string,
+    logCount: number
+}
+
 export class Report implements IReport {
     chartData: any[];
 

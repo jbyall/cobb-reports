@@ -3,6 +3,7 @@ import { ActivatedRoute, Router} from '@angular/router';
 import { IReport } from "./Report";
 import { ReportsService } from "./reports.service";
 import { ChartReadyEvent } from 'ng2-google-charts';
+import { DxChartModule } from 'devextreme-angular';
 
 declare let google:any
 
@@ -16,13 +17,16 @@ export class ReportsComponent implements OnInit, ChartReadyEvent {
     reports: IReport[];
     errorMessage: string;
     pieChartData: any;
+    dxChartData: IReport[];
+    types: string[] = ["spline"];
+    chartTitle: string;
 
     constructor(private _route: ActivatedRoute, private _router: Router, private _reportsService: ReportsService) { }
 
     ngOnInit(): void {
         const id = +this._route.snapshot.paramMap.get('id');
         const time = +this._route.snapshot.paramMap.get('time');
-        const title = this._route.snapshot.paramMap.get('title');
+        this.chartTitle = this._route.snapshot.paramMap.get('title');
         var dur = time / 67;
         var tix = [];
         var ct = 2;
@@ -33,26 +37,27 @@ export class ReportsComponent implements OnInit, ChartReadyEvent {
         this._reportsService.getReports(id)
             .subscribe(resp => {
                 this.reports = resp;
-                this.pieChartData = {
-                    chartType: 'LineChart',
-                    dataTable: this.reports["chartData"],
-                    options: {
-                        title: title,
-                        series: {
-                            0: { targetAxisIndex: 0 },
-                            1: { targetAxisIndex: 1 }
-                        },
-                        vAxes: {
-                            0: { title: 'Boost Error' },
-                            1: { title: 'Gear' }
-                        },
-                        hAxis: {
-                            ticks: tix
-                        },
-                        width: 1800,
-                        height: 800
-                    },
-                };
+                this.dxChartData = resp;
+                // this.pieChartData = {
+                //     chartType: 'LineChart',
+                //     dataTable: this.reports["chartData"],
+                //     options: {
+                //         title: title,
+                //         series: {
+                //             0: { targetAxisIndex: 0 },
+                //             1: { targetAxisIndex: 1 }
+                //         },
+                //         vAxes: {
+                //             0: { title: 'Boost Error' },
+                //             1: { title: 'Gear' }
+                //         },
+                //         hAxis: {
+                //             ticks: tix
+                //         },
+                //         width: 1800,
+                //         height: 800
+                //     },
+                // };
             });
     }
 }

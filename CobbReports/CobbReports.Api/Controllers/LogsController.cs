@@ -40,27 +40,32 @@ namespace CobbReports.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var log = _context.Logs.Where(l => l.LogInfoId == id).OrderBy(l => l.Time).ToList();
-            var fields = new Dictionary<string, string>
-            {
-                {"Time", "Time" },
-                {"ThrottlePos", "Throttle" },
-                {"GearPosition", "Gear" },
-                {"TDBoostError", "Boost Error" },
-            };
+            var log = _context.Logs
+                .Where(l => l.LogInfoId == id)
+                .OrderBy(l => l.Time)
+                .Select(l => new { time=l.Time, throttlePos=l.ThrottlePos, gearPosition=l.GearPosition, tdBoostError=l.TDBoostError })
+                .ToList();
+            return Json(log);
+            //var fields = new Dictionary<string, string>
+            //{
+            //    {"Time", "Time" },
+            //    {"ThrottlePos", "Throttle" },
+            //    {"GearPosition", "Gear" },
+            //    {"TDBoostError", "Boost Error" },
+            //};
 
-            var stuff = getChartDataArray(log, fields);
-            var resultObject = new { chartData = stuff };
+            //var stuff = getChartDataArray(log, fields);
+            //var resultObject = new { chartData = stuff };
 
-            //var result = JArray.FromObject(stuff);
-            var result = JObject.FromObject(resultObject);
-            return new JsonResult(result);
-            if (log == null)
-            {
-                return NotFound();
-            }
+            ////var result = JArray.FromObject(stuff);
+            //var result = JObject.FromObject(resultObject);
+            //return new JsonResult(result);
+            //if (log == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return Ok(log);
+            //return Ok(log);
         }
 
 

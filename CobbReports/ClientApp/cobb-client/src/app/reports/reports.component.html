@@ -1,8 +1,44 @@
 
 <div>
     <h2>Chart</h2>
-    <div>
-        <google-chart [data]="pieChartData"></google-chart>
+    <div id="chart-demo">
+        <!-- Palette: 'Default' | 'Soft Pastel' | 'Harmony Light' | 'Pastel' | 'Bright' | 'Soft' | 'Ocean' | 'Vintage' | 'Violet' -->
+        <dx-chart [dataSource]="dxChartData"
+            palette="default"
+            zoomingMode="all"
+            scrollingMode="all"
+            [title]="chartTitle">
+            <dxo-crosshair [enabled]="true">
+                    <dxo-label [visible]="true"></dxo-label>
+                </dxo-crosshair>
+                <dxo-loading-indicator [show]="true"></dxo-loading-indicator>
+            <dxi-value-axis name="big" [synchronizedValue]="0" [multipleAxesSpacing]="10"></dxi-value-axis>
+            <dxi-value-axis name="small" position="right" [synchronizedValue]="0"></dxi-value-axis>
+            <dxi-series valueField="throttlePos" name="Throttle" axis="big"></dxi-series>
+            <dxi-series valueField="gearPosition" name="Gear" axis="small"></dxi-series>
+            <dxi-series valueField="tdBoostError" name="Boost Error" axis="small"></dxi-series>
+            <dxo-common-series-settings #seriesSettings
+                argumentField="time"
+                [type]="types[0]">
+                <dxo-spline>
+                    <dxo-point [visible]="false"></dxo-point>
+                </dxo-spline>
+            </dxo-common-series-settings>
+            <dxo-margin [bottom]="20"></dxo-margin>
+            <dxo-common-axis-settings>
+                <dxo-grid [visible]="true"></dxo-grid>
+            </dxo-common-axis-settings>
+            <dxo-legend
+                verticalAlignment="top"
+                horizontalAlignment="right">
+            </dxo-legend>
+            <dxo-export [enabled]="true"></dxo-export>
+            <dxo-tooltip [enabled]="true"></dxo-tooltip>
+            
+        </dx-chart>
     </div>
+    <!-- <div>
+        <google-chart [data]="pieChartData"></google-chart>
+    </div> -->
 </div>
 

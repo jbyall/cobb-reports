@@ -24,6 +24,8 @@
     "@types/google.visualization": "0.0.40",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
+    "devextreme": "^17.1.7",
+    "devextreme-angular": "^17.1.7",
     "jquery": "^3.2.1",
     "ng2-google-charts": "^3.3.0",
     "rxjs": "^5.4.2",

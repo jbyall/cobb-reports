@@ -25,7 +25,11 @@
 //    wategateMax: number
 //}
 export interface IReport {
-    chartData: any[];
+    //chartData: any[];
+    time: number;
+    throttlePos: number;
+    gearPosition: number;
+    tdBoostError: number;
 }
 
 export interface ILog {
@@ -38,15 +42,19 @@ export interface ILog {
 }
 
 export class Report implements IReport {
-    chartData: any[];
+    time: number = 0;
+    throttlePos: number = 0;
+    gearPosition: number = 0;
+    tdBoostError: number = 0;
+    // chartData: any[];
 
-    constructor() {
-        this.chartData = [
-            ["Year", "Sales", "Expenses"],
-            ["2004", 1000, 400],
-            ["2005", 1170, 460],
-            ["2006", 1120, 1120],
-            ["2007", 1030, 540]
-        ];
-    }
+    // constructor() {
+    //     this.chartData = [
+    //         ["Year", "Sales", "Expenses"],
+    //         ["2004", 1000, 400],
+    //         ["2005", 1170, 460],
+    //         ["2006", 1120, 1120],
+    //         ["2007", 1030, 540]
+    //     ];
+    // }
 }

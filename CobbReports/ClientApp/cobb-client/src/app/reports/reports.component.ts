@@ -27,17 +27,18 @@ export class ReportsComponent implements OnInit, ChartReadyEvent {
         const id = +this._route.snapshot.paramMap.get('id');
         const time = +this._route.snapshot.paramMap.get('time');
         this.chartTitle = this._route.snapshot.paramMap.get('title');
-        var dur = time / 67;
-        var tix = [];
-        var ct = 2;
-        for (var i = 0; i < dur; i+=2) {
-            tix.push(ct);
-            ct = ct + 2;
-        }
+        // var dur = time / 67;
+        // var tix = [];
+        // var ct = 2;
+        // for (var i = 0; i < dur; i+=2) {
+        //     tix.push(ct);
+        //     ct = ct + 2;
+        // }
         this._reportsService.getReports(id)
             .subscribe(resp => {
                 this.reports = resp;
-                this.dxChartData = resp;
+                this.dxChartData = this.reports;
+                var test = "";
                 // this.pieChartData = {
                 //     chartType: 'LineChart',
                 //     dataTable: this.reports["chartData"],

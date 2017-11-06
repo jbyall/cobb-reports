@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,20 +33,44 @@ namespace CobbReports.Api.Controllers
         }
 
         // GET: api/Logs/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetLog([FromRoute] int id)
+        [HttpPost("{id}")]
+        public async Task<IActionResult> GetLog([FromRoute] int id, [FromBody] List<string> fields)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var log = _context.Logs
-                .Where(l => l.LogInfoId == id)
-                .OrderBy(l => l.Time)
-                .Select(l => new { time=l.Time, throttlePos=l.ThrottlePos, gearPosition=l.GearPosition, tdBoostError=l.TDBoostError })
-                .ToList();
-            return Json(log);
+            //var fields = new List<string>
+            //{
+            //    "Time","ThrottlePos", "GearPosition", "TDBoostError"
+            //};
+            Type logType = typeof(Log);
+            var itemParam = Expression.Parameter(logType, "x");
+            var addMethod = typeof(Dictionary<string, object>).GetMethod("Add", new[] { typeof(string), typeof(object) });
+            var selector = Expression.ListInit(
+                Expression.New(typeof(Dictionary<string, object>)),
+                fields.Select(field => Expression.ElementInit(addMethod,
+                    Expression.Constant(field),
+                    Expression.Convert(
+                        Expression.PropertyOrField(itemParam, field),
+                        typeof(object)
+                    )
+                )));
+            var lambda = Expression.Lambda<Func<Log, Dictionary<string, object>>>(selector, itemParam);
+            var result = _context.Logs.OrderBy(l => l.Time).Select(lambda.Compile());
+
+            //var log = _context.Logs.OrderBy(l => l.Time);
+            //var log = _context.Logs.OrderBy(l => l.Time)
+            //    .Where(l => l.LogInfoId == id)
+            //    .OrderBy(l => l.Time)
+            //    .Select(l => new { time = l.Time, throttlePos = l.ThrottlePos, gearPosition = l.GearPosition, tdBoostError = l.TDBoostError })
+            //    .ToList();
+
+            return Json(result);
+
+
+
             //var fields = new Dictionary<string, string>
             //{
             //    {"Time", "Time" },
@@ -146,7 +171,7 @@ namespace CobbReports.Api.Controllers
         }
 
         #region Helpers
-        private object[,] getChartDataArray(List<Log> logs, Dictionary<string,string> fields)
+        private object[,] getChartDataArray(List<Log> logs, Dictionary<string, string> fields)
         {
             var properties = typeof(Log).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             var rowCount = logs.Count + 1;
@@ -171,7 +196,7 @@ namespace CobbReports.Api.Controllers
                     result[i, j] = typeof(Log).GetProperty(kvp.Key).GetValue(logs[i - 1]);
                     j++;
                 }
-                
+
             }
 
             return result;

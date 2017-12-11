@@ -31,67 +31,76 @@ namespace CobbReports.Api.Controllers
         {
             return _context.Logs.Take(3);
         }
-
-        // GET: api/Logs/5
-        [HttpPost("{id}")]
-        public async Task<IActionResult> GetLog([FromRoute] int id, [FromBody] List<string> fields)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetLogs([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            //var fields = new List<string>
-            //{
-            //    "Time","ThrottlePos", "GearPosition", "TDBoostError"
-            //};
-            Type logType = typeof(Log);
-            var itemParam = Expression.Parameter(logType, "x");
-            var addMethod = typeof(Dictionary<string, object>).GetMethod("Add", new[] { typeof(string), typeof(object) });
-            var selector = Expression.ListInit(
-                Expression.New(typeof(Dictionary<string, object>)),
-                fields.Select(field => Expression.ElementInit(addMethod,
-                    Expression.Constant(field),
-                    Expression.Convert(
-                        Expression.PropertyOrField(itemParam, field),
-                        typeof(object)
-                    )
-                )));
-            var lambda = Expression.Lambda<Func<Log, Dictionary<string, object>>>(selector, itemParam);
-            var result = _context.Logs.OrderBy(l => l.Time).Select(lambda.Compile());
-
-            //var log = _context.Logs.OrderBy(l => l.Time);
-            //var log = _context.Logs.OrderBy(l => l.Time)
-            //    .Where(l => l.LogInfoId == id)
-            //    .OrderBy(l => l.Time)
-            //    .Select(l => new { time = l.Time, throttlePos = l.ThrottlePos, gearPosition = l.GearPosition, tdBoostError = l.TDBoostError })
-            //    .ToList();
-
+            var result = _context.Logs.Where(l => l.LogInfoId == id).ToList();
             return Json(result);
-
-
-
-            //var fields = new Dictionary<string, string>
-            //{
-            //    {"Time", "Time" },
-            //    {"ThrottlePos", "Throttle" },
-            //    {"GearPosition", "Gear" },
-            //    {"TDBoostError", "Boost Error" },
-            //};
-
-            //var stuff = getChartDataArray(log, fields);
-            //var resultObject = new { chartData = stuff };
-
-            ////var result = JArray.FromObject(stuff);
-            //var result = JObject.FromObject(resultObject);
-            //return new JsonResult(result);
-            //if (log == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return Ok(log);
         }
+
+        //// GET: api/Logs/5
+        //[HttpPost("{id}")]
+        //public async Task<IActionResult> GetLog([FromRoute] int id, [FromBody] List<string> fields)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    //var fields = new List<string>
+        //    //{
+        //    //    "Time","ThrottlePos", "GearPosition", "TDBoostError"
+        //    //};
+        //    Type logType = typeof(Log);
+        //    var itemParam = Expression.Parameter(logType, "x");
+        //    var addMethod = typeof(Dictionary<string, object>).GetMethod("Add", new[] { typeof(string), typeof(object) });
+        //    var selector = Expression.ListInit(
+        //        Expression.New(typeof(Dictionary<string, object>)),
+        //        fields.Select(field => Expression.ElementInit(addMethod,
+        //            Expression.Constant(field),
+        //            Expression.Convert(
+        //                Expression.PropertyOrField(itemParam, field),
+        //                typeof(object)
+        //            )
+        //        )));
+        //    var lambda = Expression.Lambda<Func<Log, Dictionary<string, object>>>(selector, itemParam);
+        //    var result = _context.Logs
+        //        .Where(l => l.LogInfoId == id)
+        //        .OrderBy(l => l.Time)
+        //        .Select(lambda.Compile());
+
+        //    //var log = _context.Logs.OrderBy(l => l.Time);
+        //    //var log = _context.Logs.OrderBy(l => l.Time)
+        //    //    .Where(l => l.LogInfoId == id)
+        //    //    .OrderBy(l => l.Time)
+        //    //    .Select(l => new { time = l.Time, throttlePos = l.ThrottlePos, gearPosition = l.GearPosition, tdBoostError = l.TDBoostError })
+        //    //    .ToList();
+
+        //    return Json(result);
+
+
+
+        //    //var fields = new Dictionary<string, string>
+        //    //{
+        //    //    {"Time", "Time" },
+        //    //    {"ThrottlePos", "Throttle" },
+        //    //    {"GearPosition", "Gear" },
+        //    //    {"TDBoostError", "Boost Error" },
+        //    //};
+
+        //    //var stuff = getChartDataArray(log, fields);
+        //    //var resultObject = new { chartData = stuff };
+
+        //    ////var result = JArray.FromObject(stuff);
+        //    //var result = JObject.FromObject(resultObject);
+        //    //return new JsonResult(result);
+        //    //if (log == null)
+        //    //{
+        //    //    return NotFound();
+        //    //}
+
+        //    //return Ok(log);
+        //}
 
 
         // PUT: api/Logs/5
